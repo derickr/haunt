@@ -1,0 +1,6 @@
+You need to copy twitter-example.sqlite to twitter.sqlite, or to another file
+name that you can pass as argument to run.php.
+You also need to go to settings the first time you run it, and fill in the
+four OAuth parameters.
+
+This client requires PHP 5.3, php-gtk and pecl/oauth.

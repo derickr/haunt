@@ -1,0 +1,142 @@
+# Debian Color Scheme
+
+pixmap_path "/usr/share/pixmaps"
+
+style "default"
+{
+  GtkWidget::interior_focus = 1
+  GtkButton::default_border = { 0, 0, 0, 0 }
+  GtkButton::default_outside_border = { 0, 0, 0, 0 }
+  GtkRange::trough_border = 0
+
+  GtkWidget::focus_padding = 1
+
+  GtkPaned::handle_size = 6
+
+  GtkRange::slider_width = 17
+  GtkRange::stepper_size = 17
+  GtkScrollbar::min_slider_length = 40
+  GtkScrollbar::slider_width    = 50
+  GtkScrollbar::stepper_size    = 50
+  GtkCheckButton::indicator_size = 12
+  GtkMenuBar::internal-padding = 0
+
+  #xthickness = 2
+  #ythickness = 4
+  xthickness = 1
+  ythickness = 1
+
+  fg[NORMAL]       = "#ffffff"
+  fg[ACTIVE]       = "#ffffff"
+  fg[PRELIGHT]     = "#ffffff"
+  fg[SELECTED]     = "#ffffff" #"#FFFFFF"
+  fg[INSENSITIVE]  = "#747474"
+
+  bg[NORMAL]       = "#000000"
+  bg[ACTIVE]       = "#444444" #button pressed and taskbar active
+  bg[PRELIGHT]     = "#111111"
+  bg[SELECTED]     = "#555555" #"#bbbbb0"
+  bg[INSENSITIVE]  = "#888888"
+
+  base[NORMAL]     = "#000000"
+  base[ACTIVE]     = "#222222"
+  base[PRELIGHT]   = "#111111"
+  base[SELECTED]   = "#555555"
+  base[INSENSITIVE]= "#888888"
+
+  text[NORMAL]     = "#000000"
+  text[ACTIVE]     = "#ffffff"
+  text[PRELIGHT]   = "#ffffff"
+  text[SELECTED]   = "#ffffff" #"#ffffff"
+  text[INSENSITIVE]= "#747474"
+
+  font_name = "Sans 5"
+
+}
+
+style "notebook" = "default"
+{
+  xthickness = 2
+  ythickness = 2
+}
+
+style "frame" = "default"
+{
+  xthickness = 1
+  ythickness = 1
+}
+
+style "button" = "default"
+{
+  xthickness = 2
+  ythickness = 2
+}
+
+style "menu" = "default"
+{
+  xthickness = 2
+  ythickness = 2
+}
+
+style "menuitem" = "default"
+{
+  xthickness = 2
+  ythickness = 3
+}
+
+style "menubar" = "menu"
+{
+  xthickness = 3
+  ythickness = 3
+}
+
+style "thin" = "default"
+{
+  xthickness = 1
+  ythickness = 1
+}
+
+style "slight"
+{
+  font_name = "Sans 4"
+  text[NORMAL] = "#000000"
+  text[ACTIVE]     = "#ff0000"
+  text[PRELIGHT]   = "#00ff00"
+  text[SELECTED]   = "#0000ff"
+  text[INSENSITIVE]= "#747474"
+}
+
+style "entry"
+{
+	font_name = "Sans 6"
+	bg[NORMAL] = "#222222"
+}
+
+style "label"
+{
+	font_name = "Sans Bold 6"
+}
+
+class "GtkWidget" style "default"
+class "GtkNotebook" style "notebook"
+class "GtkButton" style "button"
+class "GtkFrame" style "frame"
+class "GtkMenuBar" style "menubar"
+class "GtkMenu" style "menu"
+class "GtkMenuItem" style "menuitem"
+class "GtkScrollbar" style "thin"
+class "GtkSpinButton" style "thin"
+class "GtkEntry" style "entry"
+class "GtkLabel" style "label"
+
+widget_class "*.GtkStatusbar.*" style "slight"
+widget_class "*.GtkButton.*" style "button"
+widget_class "*.GtkMenuItem.*" style "menuitem"
+widget_class "*.GtkAccelMenuItem.*" style "menuitem"
+widget_class "*.GtkRadioMenuItem.*" style "menuitem"
+widget_class "*.GtkCheckMenuItem.*" style "menuitem"
+widget_class "*.GtkImageMenuItem.*" style "menuitem"
+widget_class "*.GtkSeparatorMenuItem.*" style "menuitem"
+widget_class "*.GtkEntry.*" style "entry"
+widget_class "*.GtkLabel.*" style "label"
+
