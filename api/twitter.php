@@ -449,8 +449,9 @@ class drtFetcher
 
 	function fetchSearchString( $search, $max )
 	{
-		$url = "http://search.twitter.com/search.json?since_id={$max}&rpp=100&q=" . urlencode( $search );
-		return json_decode( $this->fetchFromUrl( $url ) );
+		$url = "https://api.twitter.com/1.1/search/tweets.json?";
+		$json = $this->fetchJsonString( $url, array( 'since_id' => $max, 'count' => 100, 'q' => urlencode( $search ) ) );
+		return $json;
 	}
 
 	function canCall()
@@ -484,40 +485,26 @@ class drtFetcher
 
 	function parseSearchResult( $result )
 	{
-		// first we need to do a lookup of the user ID, cause twitter is stupid
-		$q = $this->d->createSelectQuery();
-		$q->select( 'id' )->from( 'user' )
-		  ->where( $q->expr->eq( 'screen_name', $q->bindValue( $result->from_user ) ) );
-		$s = $q->prepare();
-		$s->execute();
-		$r = $s->fetchAll();
-		if ( count( $r ) == 0 )
-		{
-			$userId = $this->fetchUserIdByScreenName( $result->from_user );
-		}
-		else
-		{
-			$userId = $r[0]['id'];
-		}
-
-		$q = $this->createUpdateOrInsert( 'status', $result->id );
-		$q->set( 'user_id', $q->bindValue( $userId ) );
+		$id_str = (string) $result->id_str;
+		$q = $this->createUpdateOrInsert( 'status', $id_str );
+		$q->set( 'user_id', $q->bindValue( $result->user->id ) );
 		$q->set( 'type', $q->bindValue( 'search' ) );
 		$q->set( 'time', $q->bindValue( strtotime( $result->created_at ) ) );
 		$q->set( 'text', $q->bindValue( (string) $result->text ) );
 		$q->set( 'source', $q->bindValue( (string) $result->source ) );
-		$q->set( 'in_reply_to_user', $q->bindValue( (int) $result->to_user_id ) );
+		$q->set( 'in_reply_to_user', $q->bindValue( (int) $result->in_reply_to_user_id ) );
 		$s = $q->prepare();
+
 		$s->execute();
 	}
 
 	function parseSearchResults( $json )
 	{
 		$count = 0;
-		foreach ( $json->results as $result )
+		foreach ( $json->statuses as $result )
 		{
-			$count++;
 			$this->parseSearchResult( $result );
+			$this->parseUser( $result->user );
 		}
 		return $count;
 	}
