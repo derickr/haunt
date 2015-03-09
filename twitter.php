@@ -539,7 +539,6 @@ class Twitter extends GtkWindow
 				$q->expr->like( 'status.text', $q->bindValue( "%{$this->searchTerm}%" ) )
 			) );
 			$this->searchTerm = '';
-			$fetchLimit = 500;
 		}
 		$q->orderBy( 'status.time', ezcQuerySelect::DESC )->limit( $fetchLimit );
 		$s = $q->prepare();
