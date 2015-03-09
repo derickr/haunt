@@ -228,10 +228,8 @@ class drtFetcher
 
 	function fixURLs( $text, $urls )
 	{
-		var_dump( $urls );
 		foreach ( $urls as $url )
 		{
-			var_dump ($url, $text);
 			if ($url->expanded_url && $url->url) {
 				$text = str_replace( $url->url, $url->expanded_url, $text );
 			}
