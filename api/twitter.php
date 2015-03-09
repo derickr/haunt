@@ -449,6 +449,7 @@ class drtFetcher
 	function fetchJsonString( $url, array $params )
 	{
 		$ret = $this->doOAuth( $url, $params );
+		echo "Fetching: ", $url, ' - ', var_export( $params, true ), "\n";
 		return json_decode( $ret );
 	}
 
