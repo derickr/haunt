@@ -249,6 +249,8 @@ class drtFetcher
 		$q->set( 'user_id', $q->bindValue( (int) $json->user->id ) );
 		$s = $q->prepare();
 		$s->execute();
+
+		return (int) $json->id;
 	}
 
 	function parseDirectMessage( $json )
@@ -275,13 +277,18 @@ class drtFetcher
 		$s->execute();
 	}
 
-	function parseTimeline( $json )
+	function parseTimeline( $json, &$lowestId )
 	{
+		$lowestId = PHP_INT_MAX;
 		$this->message( 'Processing timeline.' );
 		$count = 0;
 		foreach( $json as $status )
 		{
-			$this->parseStatus( $status );
+			$id = $this->parseStatus( $status );
+			if ( $id < $lowestId )
+			{
+				$lowestId = $id;
+			}
 			$this->parseUser( $status->user );
 			$count++;
 			$this->message( 'Processing timeline: ' . $count );
@@ -529,16 +536,21 @@ class drtFetcher
 		}
 
 		$this->setMessageLead( "Fetching tweets" );
-		$page = 1;
-		$max = $this->getMaxId( 'public' );
+		$max_id = NULL;
+
+		$since_id = $this->getMaxId( 'public' );
 		do
 		{
 			$url = "https://api.twitter.com/1.1/statuses/home_timeline.json";
-			$json = $this->fetchJsonString( $url, array( 'since_id' => $max, 'count' => 200, 'page' => $page, 'include_entities' => 1 ) );
-			$newStatuses = $this->parseTimeline( $json );
-			$page++;
+			$options = array( 'since_id' => $since_id, 'count' => 200, 'include_entities' => 1 );
+			if ( $max_id !== NULL )
+			{
+				$options['max_id'] = $max_id - 1;
+			}
+			$json = $this->fetchJsonString( $url, $options );
+			$newStatuses = $this->parseTimeline( $json, $max_id );
 			$total += $newStatuses;
-		} while ( $newStatuses >= 190 && $this->canCall() );
+		} while ( $newStatuses != 0 );
 
 		$this->setMessageLead( "Fetching direct messages" );
 		$page = 1;
