@@ -226,15 +226,36 @@ class drtFetcher
 		$s->execute();
 	}
 
-	function fixURLs( $text, $urls )
+	function fixURLs( $text, $entities )
 	{
-		foreach ( $urls as $url )
+		if ( isset( $entities->urls ) )
 		{
-			if ($url->expanded_url && $url->url) {
-				$text = str_replace( $url->url, $url->expanded_url, $text );
+			foreach ( $entities->urls as $url )
+			{
+				if ($url->expanded_url && $url->url) {
+					$text = str_replace( $url->url, $url->expanded_url, $text );
+				}
+			}
+		}
+		if ( isset( $entities->media ) )
+		{
+			foreach ( $entities->media as $url )
+			{
+				if ($url->expanded_url && $url->url) {
+					$text = str_replace( $url->url, $url->expanded_url, $text );
+				}
 			}
 		}
 		return $text;
+	}
+
+	function fixText( $tweet )
+	{
+		if ( isset( $tweet->full_text ) )
+		{
+			return (string) $tweet->full_text;
+		}
+		return (string) $tweet->text;
 	}
 
 	function parseStatus( $json )
@@ -242,7 +263,17 @@ class drtFetcher
 		$q = $this->createUpdateOrInsert( 'status', $json->id );
 		$q->set( 'type', $q->bindValue( 'public' ) );
 		$q->set( 'time', $q->bindValue( strtotime( $json->created_at ) ) );
-		$q->set( 'text', $q->bindValue( $this->fixURLs( (string) $json->text, $json->entities->urls) ) );
+
+		if ( isset( $json->retweeted_status ) )
+		{
+			$tweetText = "RT @{$json->retweeted_status->user->screen_name}: " . $this->fixURLs( $this->fixText( $json->retweeted_status ), $json->retweeted_status->entities );
+		}
+		else
+		{
+			$tweetText = $this->fixURLs( $this->fixText( $json ), $json->entities );
+		}
+		$q->set( 'text', $q->bindValue( $tweetText ) );
+
 		$q->set( 'source', $q->bindValue( (string) $json->source ) );
 		$q->set( 'in_reply_to_status', $q->bindValue( $json->in_reply_to_status_id ) );
 		$q->set( 'in_reply_to_user', $q->bindValue( (int) $json->in_reply_to_user_id ) );
@@ -496,7 +527,18 @@ class drtFetcher
 		$q->set( 'user_id', $q->bindValue( $result->user->id ) );
 		$q->set( 'type', $q->bindValue( 'search' ) );
 		$q->set( 'time', $q->bindValue( strtotime( $result->created_at ) ) );
-		$q->set( 'text', $q->bindValue( (string) $result->text ) );
+
+		//$q->set( 'text', $q->bindValue( (string) $result->text ) );
+		if ( isset( $result->retweeted_status ) )
+		{
+			$tweetText = "RT @{$result->retweeted_status->user->screen_name}: " . $this->fixURLs( $this->fixText( $result->retweeted_status ), $result->retweeted_status->entities );
+		}
+		else
+		{
+			$tweetText = $this->fixURLs( $this->fixText( $result ), $result->entities );
+		}
+		$q->set( 'text', $q->bindValue( $tweetText ) );
+
 		$q->set( 'source', $q->bindValue( (string) $result->source ) );
 		$q->set( 'in_reply_to_user', $q->bindValue( (int) $result->in_reply_to_user_id ) );
 		$s = $q->prepare();
@@ -543,7 +585,7 @@ class drtFetcher
 		do
 		{
 			$url = "https://api.twitter.com/1.1/statuses/home_timeline.json";
-			$options = array( 'since_id' => $since_id, 'count' => 200, 'include_entities' => 1 );
+			$options = array( 'since_id' => $since_id, 'count' => 200, 'include_entities' => 1, 'tweet_mode' => 'extended' );
 			if ( $max_id !== NULL )
 			{
 				$options['max_id'] = $max_id - 1;
