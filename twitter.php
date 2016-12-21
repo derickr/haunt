@@ -522,6 +522,38 @@ class Twitter extends GtkWindow
 		$r = $s->fetchAll();
 		$unread = $r[0]['count(*)'];
 
+		/* Fetch images for users that are returned here */
+		if ( function_exists( 'imagecreatefromstring' ) )
+		{
+			// fetch the users for the last max(100, unread-messages) messages
+			$fetchLimit = max(100, $unread);
+
+			$q = $GLOBALS['d']->createSelectQuery();
+			$q->select( 'status.user_id' )
+			  ->from( 'status' )
+			  ->leftJoin( 'user', 'status.user_id', 'user.id' )
+			  ->where( $q->expr->not( $q->expr->isNull( 'status.id' ) ) );
+			if ( $this->searchTerm && $this->searchTerm != "" )
+			{
+				$q->where( $q->expr->lOr(
+					$q->expr->like( 'user.name', $q->bindValue( "%{$this->searchTerm}%" ) ),
+					$q->expr->like( 'user.screen_name', $q->bindValue( "%{$this->searchTerm}%" ) ),
+					$q->expr->like( 'status.text', $q->bindValue( "%{$this->searchTerm}%" ) )
+				) );
+			}
+			$q->orderBy( 'status.time', ezcQuerySelect::DESC )->limit( $fetchLimit );
+			$s = $q->prepare();
+			$s->execute();
+
+			$userIds = [];
+			foreach ( $s as $object )
+			{
+				$userIds[] = $object['user_id'];
+			}
+
+			$this->twitter->fetchProfileImages( $userIds );
+		}
+
 		// fetch the last max(100, unread-messages) messages
 		$fetchLimit = max(100, $unread);
 
@@ -620,10 +652,6 @@ class Twitter extends GtkWindow
 		$s->execute();
 
 		$new = $this->twitter->fetchNewStatuses();
-		if ( function_exists( 'imagecreatefromstring' ) )
-		{
-			$this->twitter->fetchProfileImages();
-		}
 //		$this->twitter->fetchAllFriends();
 		$this->twitter->message( 'Updating timeline' );
 

@@ -369,10 +369,14 @@ class drtFetcher
 		return $count;
 	}
 
-	function fetchProfileImages()
+	function fetchProfileImages( $userIds = null )
 	{
 		$q = $this->d->createSelectQuery();
 		$q->select( 'name, profile_image_url' )->from( 'user' );
+		if ( $userIds )
+		{
+			$q->where( $q->expr->in( 'id', $userIds ) );
+		}
 		$s = $q->prepare();
 		$s->execute();
 		foreach ( $s as $r )
