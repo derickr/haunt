@@ -400,7 +400,7 @@ class Twitter extends GtkWindow
 	public function checkWlanLocation()
 	{
 		$this->coords = null;
-		if ( $this->twitter->useWlan )
+		if ( false /* $this->twitter->useWlan */ )
 		{
 			$this->locationInfo = $GLOBALS['wlanPos']->getPosition();
 			$this->coords = array( 0, 0, $this->locationInfo->latitude, $this->locationInfo->longitude );
