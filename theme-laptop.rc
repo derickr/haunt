@@ -50,7 +50,7 @@ style "default"
   text[SELECTED]   = "#ffffff" #"#ffffff"
   text[INSENSITIVE]= "#747474"
 
-  font_name = "Sans 10"
+  font_name = "Sans 12"
 
 }
 
@@ -130,6 +130,11 @@ style "label"
 	font_name = "Sans Bold 10"
 }
 
+style "slight"
+{
+	font_name = "Sans 12"
+}
+
 class "GtkWidget" style "default"
 class "GtkNotebook" style "notebook"
 class "GtkButton" style "button"
@@ -141,8 +146,10 @@ class "GtkScrollbar" style "thin"
 class "GtkSpinButton" style "thin"
 class "GtkEntry" style "entry"
 class "GtkLabel" style "label"
+class "GtkTreeViewColumn" style "slight"
+class "GtkCellRendererText" style "slight"
 
-widget_class "*.GtkStatusbar.*" style "light"
+widget_class "*.GtkStatusbar.*" style "slight"
 widget_class "*.GtkButton.*" style "button"
 widget_class "*.GtkMenuItem.*" style "menuitem"
 widget_class "*.GtkAccelMenuItem.*" style "menuitem"
@@ -152,4 +159,6 @@ widget_class "*.GtkImageMenuItem.*" style "menuitem"
 widget_class "*.GtkSeparatorMenuItem.*" style "menuitem"
 widget_class "*.GtkEntry.*" style "entry"
 widget_class "*.GtkLabel.*" style "label"
+widget_class "*.GtkTreeViewColumn.*" style "slight"
+widget_class "*.GtkCellRendererText.*" style "slight"
 
