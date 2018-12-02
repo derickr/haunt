@@ -32,6 +32,7 @@ else
 	$gpsPos    = false;
 	$gpsDevice = false;
 }
+$wlanPos = false;
 
 $window = new Twitter;
 $window->show_all();
