@@ -540,6 +540,26 @@ class drtFetcher
 		} while ( $newFriends > 0 && $this->canCall() );
 	}
 
+	function loadUserByUserId( $id )
+	{
+		$q = $this->d->createSelectQuery();
+		$q->select( 'id' )->from( 'user' )
+			->where( $q->expr->eq( 'id', $q->bindValue( $id ) ) );
+		$s = $q->prepare();
+		$s->execute();
+		$r = $s->fetchAll();
+
+		if (count($r) > 0) {
+			return;
+		}
+
+		$this->setMessageLead( "Fetching user details for '$id'" );
+		$url = 'http://api.twitter.com/1.1/users/show.json';
+		$params = array( 'user_id' => urlencode( $id ) );
+		$json = $this->fetchJsonString( $url, $params );
+		$this->parseUser( $json );
+	}
+
 	function fetchUserIdByScreenName( $screenName )
 	{
 		$this->setMessageLead( "Fetching user details for '$screenName'" );
