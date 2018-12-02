@@ -36,7 +36,8 @@ class Twitter extends GtkWindow
 		$this->add_accel_group( $accels );
 
 		$this->set_icon($this->render_icon(Gtk::STOCK_ABOUT, Gtk::ICON_SIZE_DIALOG));
-		$this->set_size_request(480, 600);
+		$this->set_size_request(800, 600);
+		$this->move(1108, 398);
 		$this->set_title('Twitter Client');
 		$this->connect('destroy', array( $this, 'destroy' ) );
 		$this->connect('size-allocate', array( $this, 'foo' ));
@@ -466,9 +467,11 @@ class Twitter extends GtkWindow
 		$formatted_time = date_create( $store->get_value($position, 7) )->format( 'H:i' );
 		$message = htmlspecialchars( $message );
 		$message = preg_replace( '/@([a-z0-9_]+)/i', '<i>@\\1</i>', $message );
-		$markedUp = "<span foreground='#ffffff'><b>$display_name ($user)</b>:\n$message\n<small>$time - $formatted_time</small></span>";
+		$markedUp = "<span><b>$display_name ($user)</b>:\n$message\n<small>$time - $formatted_time</small></span>";
 		$markedUp = "<b>$display_name ($user)</b>:\n$message\n<small>$time - $formatted_time</small>";
 		$cell->set_property('markup', $markedUp);
+		$cell->set_property('foreground', '#000000');
+		$cell->set_property('foreground-set', true);
 	}
 
 	protected function distance($from) {
