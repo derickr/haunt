@@ -284,6 +284,18 @@ class drtFetcher
 		return (int) $json->id;
 	}
 
+	function parseNewDirectMessage( $json )
+	{
+		$q = $this->createUpdateOrInsert( 'status', $json->id );
+		$q->set( 'type', $q->bindValue( 'direct-new' ) );
+		$q->set( 'time', $q->bindValue( floor( $json->created_timestamp / 1000 ) ) );
+		$q->set( 'text', $q->bindValue( $this->fixURLs( (string) $json->message_create->message_data->text, $json->message_create->message_data->entities->urls) ) );
+		$q->set( 'in_reply_to_user', $q->bindValue( $json->message_create->target->recipient_id ) );
+		$q->set( 'user_id', $q->bindValue( (int) $json->message_create->sender_id ) );
+		$s = $q->prepare();
+		$s->execute();
+	}
+/*
 	function parseDirectMessage( $json )
 	{
 		$q = $this->createUpdateOrInsert( 'status', $json->id );
@@ -307,7 +319,7 @@ class drtFetcher
 		$s = $q->prepare();
 		$s->execute();
 	}
-
+*/
 	function parseTimeline( $json, &$lowestId )
 	{
 		$lowestId = PHP_INT_MAX;
@@ -327,6 +339,21 @@ class drtFetcher
 		return $count;
 	}
 
+	function parseNewDirectMessages( $json, $sent = false )
+	{
+		$this->message( 'Processing new direct messages.' );
+		$count = 0;
+		foreach( $json->events as $event )
+		{
+			$this->loadUserByUserId( $event->message_create->sender_id );
+			$this->loadUserByUserId( $event->message_create->target->recipient_id );
+			$this->parseNewDirectMessage( $event, $sent );
+			$count++;
+			$this->message( 'Processing new direct messages: ' . $count );
+		}
+		return $count;
+	}
+/*
 	function parseDirectMessages( $json, $sent = false )
 	{
 		$this->message( 'Processing direct messages.' );
@@ -354,7 +381,7 @@ class drtFetcher
 		}
 		return $count;
 	}
-
+*/
 	function parseFriends( $json )
 	{
 		$this->message( 'Processing friends.' );
@@ -599,6 +626,18 @@ class drtFetcher
 			$total += $newStatuses;
 		} while ( $newStatuses != 0 );
 
+		$this->setMessageLead( "Fetching new style direct messages" );
+		$page = 1;
+		$max = $this->getMaxId( 'direct-new' );
+//		do
+//		{
+			$url = "https://api.twitter.com/1.1/direct_messages/events/list.json";
+			$json = $this->fetchJsonString( $url, array( 'since_id' => $max, 'count' => 50, 'page' => $page, 'include_entities' => 1 ) );
+			$newStatuses = $this->parseNewDirectMessages( $json );
+//			$page++;
+//			$total += $newStatuses;
+//		} while ( $newStatuses >= 50 && $this->canCall() );
+/*
 		$this->setMessageLead( "Fetching direct messages" );
 		$page = 1;
 		$max = $this->getMaxId( 'direct' );
@@ -622,7 +661,7 @@ class drtFetcher
 			$page++;
 			$total += $newStatuses;
 		} while ( $newStatuses >= 190 && $this->canCall() );
-
+*/
 		$this->setMessageLead( 'Fetching done' );
 		$this->d->commit();
 
