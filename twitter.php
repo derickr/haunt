@@ -245,7 +245,7 @@ class Twitter extends GtkWindow
 		}
 		else
 		{
-			$this->updateentry->set_text( '@' . $model->get_value($iter, 3 ). ': ' );
+			$this->updateentry->set_text( '@' . $model->get_value($iter, 3 ). ' ' );
 		}
 		$this->updateentry->grab_focus();
 		$this->updateentry->set_position( -1 );
