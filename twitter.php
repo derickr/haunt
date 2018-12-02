@@ -95,7 +95,7 @@ class Twitter extends GtkWindow
 
 		// Create an update area
 		$this->updateentry = new GtkEntry();
-		$this->updateentry->set_max_length(140);
+		$this->updateentry->set_max_length(280);
 		$this->updateentry->set_sensitive(true);
 		$this->updateentry->connect('activate', array($this, 'newtweet'));
 
