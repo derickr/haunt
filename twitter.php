@@ -625,17 +625,18 @@ class Twitter extends GtkWindow
 
 	public function getColor( $object )
 	{
-		$n = $object['read'] == 0 ? 6 : 3;
+		$r = $object['read'] == 0;
 		if ( strstr( $object['text'], "@{$this->twitter->username}" ) !== false )
 		{
-			return "#{$n}{$n}{$n}{$n}00";
+			return $r ? "#ffff88" : "#ffffcc";
 		}
 		switch( $object['type'] )
 		{
-			case 'public': return "#0000{$n}{$n}";
-			case 'direct': return "#{$n}{$n}0000";
-			case 'direct-sent': return "#{$n}{$n}2a00";
-			case 'search': return "#00{$n}{$n}00";
+			case 'public': return $r ? "#ccccff" : "#8888cc";
+			case 'direct': return $r ? "#ffcccc" : "#cc8888";
+			case 'direct-new': return $r ? "#ffcccc" : "#cc8888";
+			case 'direct-sent': return $r ? "#ffcccc" : "#cc8888";
+			case 'search': return $r ? "#ccffcc" : "#66cc66";
 		}
 	}
 
