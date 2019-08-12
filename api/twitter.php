@@ -267,6 +267,8 @@ class drtFetcher
 		if ( isset( $json->retweeted_status ) )
 		{
 			$tweetText = "RT @{$json->retweeted_status->user->screen_name}: " . $this->fixURLs( $this->fixText( $json->retweeted_status ), $json->retweeted_status->entities );
+			$q->set( 'retweeted_user_id', $q->bindValue( (int) $json->retweeted_status->user->id ) );
+			$q->set( 'retweeted_status_id', $q->bindValue( (int) $json->retweeted_status->id ) );
 		}
 		else
 		{
@@ -333,6 +335,10 @@ class drtFetcher
 				$lowestId = $id;
 			}
 			$this->parseUser( $status->user );
+			if ( isset( $statys->retweeted_status ) )
+			{
+				$this->parseUser( $status->retweeted_status->user );
+			}
 			$count++;
 			$this->message( 'Processing timeline: ' . $count );
 		}

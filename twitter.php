@@ -564,6 +564,7 @@ class Twitter extends GtkWindow
 		$q->select( 'status.*, user.name, user.screen_name, image.image' )
 		  ->from( 'status' )
 		  ->leftJoin( 'user', 'status.user_id', 'user.id' )
+		  ->leftJoin( $q->alias( 'user', 'retweeted_user' ), 'status.reweeted_user_id', 'retweeted_user.id' )
 		  ->leftJoin( 'image', $q->expr->md5( 'user.profile_image_url'), 'image.id' )
 		  ->where( $q->expr->not( $q->expr->isNull( 'status.id' ) ) );
 		if ( $this->searchTerm && $this->searchTerm != "" )
@@ -605,9 +606,9 @@ class Twitter extends GtkWindow
 			}
 			$iter = $store->append(array(
 				$pb, 'foo', $object['name'], $object['screen_name'],
-				$object['user_id'],
+				$object['retweeted_user_id'] !== NULL ? $object['retweeted_user_id'] : $object['user_id'],
 				$object['text'], true, date( DateTime::RFC822,
-				$object['time']), $object['id'], $this->getColor( $object),
+				$object['time']), $object['retweeted_status_id'] !== NULL ? $object['retweeted_status_id'] : $object['id'], $this->getColor( $object),
 				$object['read'], $object['type'] ) );
 
 			if ( $object['read'] != 1 )
